@@ -1,7 +1,6 @@
 package moe
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -12,10 +11,12 @@ import (
 
 const baseURL = "https://kzz.moe/c/%s.htm"
 
-type MoeProvider struct{}
+type MoeProvider struct {
+	client *http.Client
+}
 
 func New() *MoeProvider {
-	return &MoeProvider{}
+	return &MoeProvider{client: provider.NewHTTPClient()}
 }
 
 func (p *MoeProvider) Name() string {
@@ -28,7 +29,7 @@ func (p *MoeProvider) Fetch(id string) (*provider.ComicMeta, error) {
 	}
 
 	url := fmt.Sprintf(baseURL, id)
-	doc, err := fetchDocument(url)
+	doc, err := p.fetchDocument(url)
 	if err != nil {
 		return nil, err
 	}
@@ -36,24 +37,14 @@ func (p *MoeProvider) Fetch(id string) (*provider.ComicMeta, error) {
 	return extractMeta(doc, url, id), nil
 }
 
-func MetaFetch(id string) ([]byte, error) {
-	p := New()
-	meta, err := p.Fetch(id)
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal(meta)
-}
-
-func fetchDocument(url string) (*goquery.Document, error) {
-	client := provider.NewHTTPClient()
+func (p *MoeProvider) fetchDocument(url string) (*goquery.Document, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("User-Agent", provider.DefaultUserAgent())
 
-	resp, err := client.Do(req)
+	resp, err := p.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch %s: %w", url, err)
 	}

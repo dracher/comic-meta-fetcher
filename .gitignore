@@ -1,5 +1,5 @@
 # Binaries
-comic-meta-fetcher
+/comic-meta-fetcher
 *.exe
 
 # Build

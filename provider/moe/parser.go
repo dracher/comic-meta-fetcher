@@ -1,6 +1,7 @@
 package moe
 
 import (
+	"html"
 	"regexp"
 	"strconv"
 	"strings"
@@ -9,6 +10,25 @@ import (
 
 	"github.com/PuerkitoBio/goquery"
 )
+
+var (
+	reCategoryEntry = regexp.MustCompile(`([\p{Han}]+)\s*\((\d+)\)`)
+	reScoreCount    = regexp.MustCompile(`(\d+)人評價`)
+	reScoreStar     = regexp.MustCompile(`([１２３４５])星\s*.*?(\d+%)`)
+	reDesc          = regexp.MustCompile(`document\.getElementById\("div_desc_content"\)\.innerHTML\s*=\s*"(.*?)";`)
+
+	reJSVarStr map[string]*regexp.Regexp
+	reJSVarInt map[string]*regexp.Regexp
+)
+
+func init() {
+	reJSVarStr = make(map[string]*regexp.Regexp, len(jsVarNames))
+	reJSVarInt = make(map[string]*regexp.Regexp, len(jsVarNames))
+	for _, name := range jsVarNames {
+		reJSVarStr[name] = regexp.MustCompile(`var\s+` + name + `\s*=\s*"([^"]*)"`)
+		reJSVarInt[name] = regexp.MustCompile(`var\s+` + name + `\s*=\s*parseInt\(\s*"([^"]*)"\s*\)`)
+	}
+}
 
 func extractMeta(doc *goquery.Document, pageURL, bookID string) *provider.ComicMeta {
 	meta := &provider.ComicMeta{
@@ -97,8 +117,7 @@ func extractMeta(doc *goquery.Document, pageURL, bookID string) *provider.ComicM
 		text := strings.TrimSpace(s.Text())
 		if strings.Contains(text, "分類：") {
 			catText := strings.TrimPrefix(text, "分類：")
-			re := regexp.MustCompile(`([\p{Han}]+)\s*\((\d+)\)`)
-			for _, match := range re.FindAllStringSubmatch(catText, -1) {
+			for _, match := range reCategoryEntry.FindAllStringSubmatch(catText, -1) {
 				if len(match) >= 3 {
 					count, _ := strconv.Atoi(match[2])
 					name := strings.TrimSpace(match[1])
@@ -118,7 +137,7 @@ func extractMeta(doc *goquery.Document, pageURL, bookID string) *provider.ComicM
 		rating.Score, _ = strconv.ParseFloat(scoreText, 64)
 
 		scoreCountText := doc.Find("table.book_score td font.font_size_s").Text()
-		if m := regexp.MustCompile(`(\d+)人評價`).FindStringSubmatch(scoreCountText); len(m) >= 2 {
+		if m := reScoreCount.FindStringSubmatch(scoreCountText); len(m) >= 2 {
 			rating.ScoreCount, _ = strconv.Atoi(m[1])
 		}
 
@@ -128,7 +147,7 @@ func extractMeta(doc *goquery.Document, pageURL, bookID string) *provider.ComicM
 				if !strings.Contains(line, "星") {
 					continue
 				}
-				m := regexp.MustCompile(`([１２３４５])星\s*.*?(\d+%)`).FindStringSubmatch(line)
+				m := reScoreStar.FindStringSubmatch(line)
 				if len(m) >= 3 {
 					rating.ScoreDist[m[1]+"星"] = m[2]
 				}
@@ -142,27 +161,19 @@ func extractMeta(doc *goquery.Document, pageURL, bookID string) *provider.ComicM
 	doc.Find("script").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 
-		reDesc := regexp.MustCompile(`document\.getElementById\("div_desc_content"\)\.innerHTML\s*=\s*"(.*?)";`)
 		if m := reDesc.FindStringSubmatch(text); len(m) >= 2 {
 			desc := m[1]
 			desc = strings.ReplaceAll(desc, `<br />`, "\n")
 			desc = strings.ReplaceAll(desc, `<br>`, "\n")
-			desc = strings.ReplaceAll(desc, `&nbsp;`, " ")
-			desc = strings.ReplaceAll(desc, `&quot;`, `"`)
-			desc = strings.ReplaceAll(desc, `&lt;`, `<`)
-			desc = strings.ReplaceAll(desc, `&gt;`, `>`)
-			desc = strings.ReplaceAll(desc, `&amp;`, `&`)
-			meta.Description = desc
+			meta.Description = html.UnescapeString(desc)
 		}
 
 		for _, varName := range jsVarNames {
-			re1 := regexp.MustCompile(`var\s+` + varName + `\s*=\s*"([^"]*)"`)
-			if m := re1.FindStringSubmatch(text); len(m) >= 2 {
+			if m := reJSVarStr[varName].FindStringSubmatch(text); len(m) >= 2 {
 				jsVars[varName] = m[1]
 				continue
 			}
-			re2 := regexp.MustCompile(`var\s+` + varName + `\s*=\s*parseInt\(\s*"([^"]*)"\s*\)`)
-			if m := re2.FindStringSubmatch(text); len(m) >= 2 {
+			if m := reJSVarInt[varName].FindStringSubmatch(text); len(m) >= 2 {
 				jsVars[varName] = m[1]
 			}
 		}
