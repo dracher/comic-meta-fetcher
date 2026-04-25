@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 go build ./...          # compile all packages
-go run main.go          # fetch and print metadata for the hardcoded test ID
+go run ./cmd/comic-meta-fetcher  # fetch and print metadata for the hardcoded test ID
 ```
 
 No tests or lint config exist yet.

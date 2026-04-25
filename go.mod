@@ -1,4 +1,4 @@
-module comic-meta-fetcher
+module github.com/dracher/comic-meta-fetcher
 
 go 1.26.1
 

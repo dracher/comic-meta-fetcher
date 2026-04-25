@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"comic-meta-fetcher/provider"
+	"github.com/dracher/comic-meta-fetcher/provider"
 
 	"github.com/PuerkitoBio/goquery"
 )
