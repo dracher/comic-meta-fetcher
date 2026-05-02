@@ -46,9 +46,33 @@ type Rating struct {
 	ScoreDist  map[string]string `json:"score_distribution,omitempty"`
 }
 
+type SearchResult struct {
+	Source     string   `json:"source"`
+	ID        string   `json:"id"`
+	URL       string   `json:"url"`
+	Title     string   `json:"title"`
+	Authors   string   `json:"authors"`
+	CoverImage string  `json:"cover_image,omitempty"`
+	Score     float64  `json:"score"`
+	Status    string   `json:"status,omitempty"`
+	UpdateDate string  `json:"update_date,omitempty"`
+	Tags      []string `json:"tags,omitempty"`
+}
+
+type SearchResponse struct {
+	Query      string         `json:"query"`
+	TotalPages int            `json:"total_pages"`
+	Page       int            `json:"page"`
+	Results    []SearchResult `json:"results"`
+}
+
 type Provider interface {
 	Name() string
 	Fetch(id string) (*ComicMeta, error)
+}
+
+type Searcher interface {
+	Search(query string) (*SearchResponse, error)
 }
 
 const defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
