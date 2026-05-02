@@ -1,44 +1,18 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
+	"github.com/dracher/comic-meta-fetcher/internal/envutil"
 	"github.com/dracher/comic-meta-fetcher/provider/moe"
 )
 
-func loadEnv(path string) {
-	f, err := os.Open(path)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	scanner := bufio.NewScanner(f)
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		key, val, ok := strings.Cut(line, "=")
-		if !ok {
-			continue
-		}
-		key = strings.TrimSpace(key)
-		val = strings.TrimSpace(val)
-		val = strings.Trim(val, `"'`)
-		if os.Getenv(key) == "" {
-			os.Setenv(key, val)
-		}
-	}
-}
-
 func main() {
-	loadEnv(".env")
+	envutil.LoadEnv(".env")
 
 	searchQuery := flag.String("s", "", "search for comics by name")
 	cookie := flag.String("cookie", "", "cookie header for authenticated requests")

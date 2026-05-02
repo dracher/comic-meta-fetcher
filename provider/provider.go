@@ -51,7 +51,7 @@ type SearchResult struct {
 	ID        string   `json:"id"`
 	URL       string   `json:"url"`
 	Title     string   `json:"title"`
-	Authors   string   `json:"authors"`
+	Authors   string   `json:"authors"` // raw comma-separated string; search results lack structured author data
 	CoverImage string  `json:"cover_image,omitempty"`
 	Score     float64  `json:"score"`
 	Status    string   `json:"status,omitempty"`
