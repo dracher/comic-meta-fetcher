@@ -32,6 +32,10 @@ func main() {
 		log.Fatalf("Failed to fetch metadata: %v", err)
 	}
 
+	if meta.Type == "" {
+		meta.Type = "comic_metar"
+	}
+
 	data, err := json.MarshalIndent(meta, "", "  ")
 	if err != nil {
 		log.Fatalf("Failed to marshal metadata: %v", err)

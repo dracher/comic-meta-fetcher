@@ -6,21 +6,27 @@ import (
 )
 
 type ComicMeta struct {
-	Source      string         `json:"source"`
-	ID          string         `json:"id"`
-	URL         string         `json:"url,omitempty"`
-	Title       string         `json:"title"`
-	Aliases     []string       `json:"aliases,omitempty"`
-	Description string         `json:"description,omitempty"`
-	CoverImage  string         `json:"cover_image,omitempty"`
-	Authors     []Author       `json:"authors,omitempty"`
-	Status      string         `json:"status,omitempty"`
-	Language    string         `json:"language,omitempty"`
-	Genres      []string       `json:"genres,omitempty"`
-	Tags        []Tag          `json:"tags,omitempty"`
-	Rating      *Rating        `json:"rating,omitempty"`
-	FollowCount int            `json:"follow_count,omitempty"`
-	Extra       map[string]any `json:"extra,omitempty"`
+	Source          string         `json:"source"`
+	ID              string         `json:"id"`
+	URL             string         `json:"url,omitempty"`
+	Title           string         `json:"title"`
+	Aliases         []string       `json:"aliases,omitempty"`
+	Description     string         `json:"description,omitempty"`
+	CoverImage      string         `json:"cover_image,omitempty"`
+	CoverImageLocal string         `json:"cover_image_local,omitempty"`
+	Authors         []Author       `json:"authors,omitempty"`
+	Status          string         `json:"status,omitempty"`
+	Language        string         `json:"language,omitempty"`
+	Genres          []string       `json:"genres,omitempty"`
+	Tags            []Tag          `json:"tags,omitempty"`
+	Rating          *Rating        `json:"rating,omitempty"`
+	FollowCount     int            `json:"follow_count,omitempty"`
+	Type            string         `json:"type"`
+	InLibrary       bool           `json:"in_library,omitempty"`
+	Blocked         bool           `json:"blocked,omitempty"`
+	CreatedAt       string         `json:"created_at,omitempty"`
+	UpdatedAt       string         `json:"updated_at,omitempty"`
+	Extra           map[string]any `json:"extra,omitempty"`
 }
 
 type Author struct {
