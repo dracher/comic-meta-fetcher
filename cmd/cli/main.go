@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -30,9 +31,11 @@ func main() {
 	}
 	p := moe.New(opts...)
 
+	ctx := context.Background()
+
 	if *searchQuery != "" {
 		fmt.Fprintf(os.Stderr, "Searching %s for: %s\n", p.Name(), *searchQuery)
-		resp, err := p.Search(*searchQuery)
+		resp, err := p.Search(ctx, *searchQuery)
 		if err != nil {
 			log.Fatalf("Search failed: %v", err)
 		}
@@ -47,7 +50,7 @@ func main() {
 	id := flag.Arg(0)
 
 	fmt.Fprintf(os.Stderr, "Fetching metadata from %s for ID: %s\n", p.Name(), id)
-	meta, err := p.Fetch(id)
+	meta, err := p.Fetch(ctx, id)
 	if err != nil {
 		log.Fatalf("Failed to fetch metadata: %v", err)
 	}

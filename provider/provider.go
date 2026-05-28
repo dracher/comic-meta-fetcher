@@ -1,6 +1,7 @@
 package provider
 
 import (
+	"context"
 	"net/http"
 	"time"
 )
@@ -68,11 +69,11 @@ type SearchResponse struct {
 
 type Provider interface {
 	Name() string
-	Fetch(id string) (*ComicMeta, error)
+	Fetch(ctx context.Context, id string) (*ComicMeta, error)
 }
 
 type Searcher interface {
-	Search(query string) (*SearchResponse, error)
+	Search(ctx context.Context, query string) (*SearchResponse, error)
 }
 
 const defaultUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"

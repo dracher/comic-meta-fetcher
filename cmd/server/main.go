@@ -35,7 +35,7 @@ func handleSearch(p *moe.MoeProvider) http.HandlerFunc {
 			return
 		}
 
-		resp, err := p.Search(q)
+		resp, err := p.Search(r.Context(), q)
 		if err != nil {
 			log.Printf("search error for q=%q: %v", q, err)
 			writeError(w, http.StatusInternalServerError, "internal server error")
@@ -54,7 +54,7 @@ func handleFetch(p *moe.MoeProvider) http.HandlerFunc {
 			return
 		}
 
-		meta, err := p.Fetch(id)
+		meta, err := p.Fetch(r.Context(), id)
 		if err != nil {
 			log.Printf("fetch error for id=%q: %v", id, err)
 			writeError(w, http.StatusInternalServerError, "internal server error")

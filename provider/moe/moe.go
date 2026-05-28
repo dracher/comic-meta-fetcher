@@ -1,6 +1,7 @@
 package moe
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -44,13 +45,13 @@ func (p *MoeProvider) Name() string {
 	return "moe"
 }
 
-func (p *MoeProvider) Fetch(id string) (*provider.ComicMeta, error) {
+func (p *MoeProvider) Fetch(ctx context.Context, id string) (*provider.ComicMeta, error) {
 	if id == "" {
 		return nil, fmt.Errorf("id cannot be empty")
 	}
 
 	u := fmt.Sprintf(baseURL, id)
-	doc, err := p.fetchDocument(u)
+	doc, err := p.fetchDocument(ctx, u)
 	if err != nil {
 		return nil, err
 	}
@@ -58,13 +59,13 @@ func (p *MoeProvider) Fetch(id string) (*provider.ComicMeta, error) {
 	return extractMeta(doc, u, id), nil
 }
 
-func (p *MoeProvider) Search(query string) (*provider.SearchResponse, error) {
+func (p *MoeProvider) Search(ctx context.Context, query string) (*provider.SearchResponse, error) {
 	if query == "" {
 		return nil, fmt.Errorf("query cannot be empty")
 	}
 
 	u := searchURL + "?s=" + url.QueryEscape(query)
-	doc, err := p.fetchDocument(u)
+	doc, err := p.fetchDocument(ctx, u)
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +73,8 @@ func (p *MoeProvider) Search(query string) (*provider.SearchResponse, error) {
 	return parseSearchResults(doc, query)
 }
 
-func (p *MoeProvider) fetchDocument(u string) (*goquery.Document, error) {
-	req, err := http.NewRequest("GET", u, nil)
+func (p *MoeProvider) fetchDocument(ctx context.Context, u string) (*goquery.Document, error) {
+	req, err := http.NewRequestWithContext(ctx, "GET", u, nil)
 	if err != nil {
 		return nil, err
 	}
