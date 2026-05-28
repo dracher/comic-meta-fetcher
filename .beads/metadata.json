@@ -1,0 +1,10 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "server",
+  "dolt_server_host": "192.168.2.242",
+  "dolt_server_port": 3307,
+  "dolt_server_user": "beads",
+  "dolt_database": "comic_meta_fetcher",
+  "project_id": "5c456937-d8a0-4598-a111-26ee4cddadc0"
+}
