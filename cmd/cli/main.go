@@ -54,6 +54,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to fetch metadata: %v", err)
 	}
+
+	if meta.Type == "" {
+		meta.Type = "comic_metar"
+	}
+
 	printJSON(meta)
 }
 

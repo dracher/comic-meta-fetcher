@@ -61,6 +61,10 @@ func handleFetch(p *moe.MoeProvider) http.HandlerFunc {
 			return
 		}
 
+		if meta.Type == "" {
+			meta.Type = "comic_metar"
+		}
+
 		writeJSON(w, http.StatusOK, meta)
 	}
 }
